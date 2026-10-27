@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sara Paleja Poems</title>
+<script>try { if (localStorage.getItem("sp-mode") === "dark") document.documentElement.setAttribute("data-mode", "dark"); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,400;1,400&family=Lato:wght@400&display=swap">
+<style>
+/* Layout: a book page. One centred block, poem lines left-aligned, lots of air. */
+:root {
+  --paper: #FDFBF7;
+  --ink: #1A1A1A;
+  --quiet: #7A746D;
+  --hover: #7A2E24;
+  --display: "Playfair Display", Georgia, serif;
+  --body: "EB Garamond", Garamond, Georgia, serif;
+  --ui: "Lato", "Helvetica Neue", Arial, sans-serif;
+  --ease: cubic-bezier(.22, .61, .36, 1);
+}
+:root[data-mode="dark"] { --paper: #0A0A0A; --ink: #E0E0E0; --quiet: #85807A; --hover: #D9A38F; color-scheme: dark; }
+
+html { background: var(--paper); }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 20px;
+  line-height: 1.75;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .5s var(--ease), color .5s var(--ease);
+}
+a { color: inherit; text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 1px; text-underline-offset: 5px; transition: color .3s var(--ease), text-decoration-color .3s var(--ease); }
+a:hover { color: var(--hover); text-decoration-color: currentColor; }
+a:focus-visible, button:focus-visible { outline: 1px solid var(--hover); outline-offset: 5px; border-radius: 2px; }
+
+/* Bar */
+.bar { max-width: 56rem; margin: 0 auto; padding-block: 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px 28px; flex-wrap: wrap; }
+.bar .home { font-family: var(--display); font-size: 1.05rem; text-decoration: none; transition: opacity .35s var(--ease); }
+:root[data-view="home"] .bar .home { opacity: 0; pointer-events: none; }
+.bar nav { display: flex; align-items: center; gap: 26px; font-family: var(--ui); font-size: 14px; color: var(--quiet); }
+.bar nav a { text-decoration: none; }
+.bar nav a[aria-current="page"] { color: var(--ink); }
+.mode { width: 20px; height: 20px; padding: 0; border: 0; background: none; color: var(--quiet); cursor: pointer; display: grid; place-items: center; transition: color .3s var(--ease), transform .5s var(--ease); }
+.mode:hover { color: var(--hover); }
+.mode svg { width: 16px; height: 16px; display: block; }
+:root[data-dark="1"] .mode { transform: rotate(180deg); }
+
+main { max-width: 56rem; margin: 0 auto; padding-block: 11vh 16vh; min-height: 60vh; }
+.view { transition: opacity .35s var(--ease), transform .35s var(--ease); }
+.view.out { opacity: 0; transform: translateY(6px); transition-duration: .18s; }
+.view.in { opacity: 0; transform: translateY(6px); }
+
+/* Home */
+.cover { text-align: center; margin-bottom: 12vh; }
+.cover h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2.8rem, 9vw, 4.8rem); line-height: 1.05; letter-spacing: -.02em; margin: 0; }
+.cover p { margin: 14px 0 0; font-style: italic; color: var(--quiet); }
+.list { width: min(32rem, 100%); margin: 0 auto; }
+.list ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.list li { display: flex; align-items: baseline; gap: .7em; }
+.list .n { font-family: var(--display); font-size: clamp(1.3rem, 3.4vw, 1.6rem); color: var(--quiet); min-width: 1.1em; font-variant-numeric: tabular-nums; }
+.list .dedication { margin: 0 0 28px; color: var(--quiet); font-size: 1.05rem; line-height: 1.7; }
+.list a { font-family: var(--display); font-size: clamp(1.3rem, 3.4vw, 1.6rem); line-height: 1.3; }
+.list h2 { margin: 64px 0 18px; font-weight: 400; font-style: italic; font-size: 1.05rem; color: var(--quiet); }
+
+/* Poem */
+.leaf { width: fit-content; max-width: 100%; margin: 0 auto; }
+.leaf .for { margin: 0 0 8px; font-style: italic; color: var(--quiet); font-size: 1.05rem; }
+.leaf h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2.1rem, 6vw, 3rem); line-height: 1.15; letter-spacing: -.015em; margin: 0 0 52px; max-width: 18ch; text-wrap: balance; }
+.verse p { margin: 0 0 1.75em; }
+.verse p:last-child { margin-bottom: 0; }
+.verse span { display: block; max-width: 34em; padding-left: 1.5em; text-indent: -1.5em; }
+.turn { max-width: 40rem; margin: 15vh auto 0; display: flex; justify-content: space-between; gap: 16px 32px; flex-wrap: wrap; font-style: italic; color: var(--quiet); }
+.turn a { min-width: 0; }
+.turn .next { margin-left: auto; text-align: right; }
+
+/* About, Contact */
+.page { max-width: 32rem; margin: 0 auto; }
+.page h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2.1rem, 6vw, 3rem); margin: 0 0 32px; }
+.page p { margin: 0; color: var(--quiet); font-style: italic; }
+.page.about p { font-style: normal; color: var(--ink); margin-bottom: 1.2em; }
+.page.about p:last-child { margin-bottom: 0; }
+.page .mail { font-style: normal; color: var(--ink); font-size: 1.3rem; display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; user-select: text; }
+.page .mail a { overflow-wrap: anywhere; }
+.copy { border: 0; background: none; padding: 0; font-family: var(--ui); font-size: 13px; color: var(--quiet); cursor: pointer; transition: color .3s var(--ease); }
+.copy:hover { color: var(--hover); }
+
+@media (max-width: 520px) {
+  body { font-size: 18.5px; }
+  .bar nav { gap: 20px; }
+  .turn .next { margin-left: 0; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, .view, body { transition: none !important; }
+}
+</style>
+<style>body{margin:0}</style>
+</head>
+<body>
+<header class="bar">
+  <a class="home" href="#">Sara Paleja</a>
+  <nav aria-label="Site">
+    <a href="#" data-nav="">Poems</a>
+    <a href="#about" data-nav="about">About</a>
+    <a href="#contact" data-nav="contact">Contact</a>
+    <button class="mode" id="mode" type="button" aria-label="Switch to dark mode">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.25"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
+    </button>
+  </nav>
+</header>
+<main><div id="app" class="view"></div></main>
+
+<script>
+const POEMS = [{"slug": "as-i-look", "title": "As I Look…", "group": "main", "stanzas": [["As I look up at the sky,", "I see a beautiful flock of birds fly,", "I see a stream of white satin clouds go by,", "I see a sky filled with tints, tones and hues up high,"], ["As I look down,", "I see a beach with the soft sand brown,", "I smell the petrichor, which shows me a world with no bounds,", "I hear the sound of the sand grumble like the ground,"], ["As I look ahead, at the coming sea,", "I see here, the world is set free,", "I see the peaceful ocean waves give me glee,", "I hear the waves slowly flee,"], ["As I look to the right,", "I see a dense forest standing fierce with might,", "I see the vast forest stretch till no more in sight,", "I see it standing alone with no fright."]]}, {"slug": "as-i-wait", "title": "As I Wait…", "group": "main", "stanzas": [["As the waves slowly skim my feet,", "I wait for my fate to meet,", "I wait alone without any fear,", "I wait for the misty sky to get clear,"], ["As I stand under a fir tree,", "I wait for an angel to take me to my glee,", "I wait with snow falling from the sky,", "I wait for the courage to help me fly,"], ["As I stand in the middle of a harsh storm,", "I wait for my new path to form,", "I wait for the winds to slow,", "I wait to meet my friends and foes,"], ["As I scramble through the jungle,", "I wait to make my life untangle,", "I wait silently, watching the chaos unfold,", "I wait for this story to be ancient lore told."]]}, {"slug": "along-the-sea", "title": "Along The Sea", "group": "main", "stanzas": [["As I walked along the seashore,", "I reminisced about the days astray,", "And heard a great lore,", "As per hearsay,"], ["As the waves crashed across the bay,", "As they swallowed themselves, like closing a door,", "Amidst the sand I lay,", "Therein lay the beauty, nothing I could ask for more."], ["As I swam across the ocean floor,", "I saw creatures from far away,", "They looked like nothing I had seen before,", "With colours like the Sun at midday."], ["As I sat on the sand as soft as hay,", "I already knew what was in store,", "Although the sky looked as clear as day,", "I knew this from my deep heart's core.", "I knew this for my heart was sore."]]}, {"slug": "falling-to-freedom", "title": "Falling To Freedom", "group": "main", "stanzas": [["As I slowly fell into the sea,", "The water already far past my knees,", "The depth not giving me the slightest fright,", "For my past gave me immense might,"], ["Running to save my lost glee, my forgotten glee,", "Trying to find the lost key,", "Like struggling to fly a kite,", "But it gave me not the fight,"], ["In the midst of it all, I could see,", "Only freedom to be,", "As I scrambled through the plight,", "And finally found the light, so bright,"], ["I did not think twice to flee,", "Or jump right into the sea,", "I never gave myself fright,", "For I knew there was something very bright."]]}, {"slug": "hadal-heart", "title": "The Journey To The Hadal Heart", "group": "main", "stanzas": [["As I swim across the seabed,", "I see the little fish being led,", "I see the fish, coloured like the sky during dawn,", "I see all the happiness in their eyes, even with many reasons to frown."], ["As I swim across the seabed,", "I see a coral reef filled with shades of red,", "I see the Sun slowly go away,", "As the blue water turns into darker hues of grey."], ["As I swim across the seabed,", "I see creatures I have never met,", "I see them in tints and tones of jade,", "I see them as they slowly fade."], ["As I swim across the seabed,", "I see the water slowly nearing a trench ahead,", "I see the water quickly clench,", "In the heavy darkness of the unbound trench."]]}, {"slug": "sweet-habit", "title": "Sweet Habits", "group": "main", "stanzas": [["I was once asked what it was like to be in Peace,", "I told them it is just like being on a beach in Greece,", "Peace is surrounded by quiet nature,", "Peace is filled with no thought of the future,"], ["Peace is slow breeze flowing through my hair,", "Peace is sewing the unwanted tear,", "Peace is the calm clatter of raindrops fast,", "Peace is something you hope will last,"], ["Peace is the beautiful scenery of the ocean blue,", "Peace is the lush green lawn with morning dew,", "Peace is seeing the fresh, cold, white snow,", "Peace is finding trees with the prettiest glow,"], ["Peace is something you cannot hear,", "Peace makes you feel like distress is nowhere near,", "Peace is a sweet habit made,", "I hope the Peace does not fade."]]}, {"slug": "never-forget", "title": "An Ode To The One We Will Never Forget", "group": "perry", "stanzas": [["The heart of mine lost its life,", "The enemy you once defeated,", "Came haunting to take your fleet,", "Desperation and distress befriended emaciation.", "Your renunciation endeavoured in delusion,", "The dreary life of yours, brittle,", "Plodding towards your long-forgotten enemy,", "Striving in infirmities of anguish,", "The anchor broke and brought with it a jarring defeat,", "The treacherous onslaught led us to the end,", "The world bearing the consequence of slain love,", "And plight ended with yellow journals in remorse."]]}, {"slug": "never-wanted", "title": "An Ode To The One With The Life He Never Wanted", "group": "perry", "stanzas": [["The pain behind the smile of yours,", "Silhouetted by an anxious deserted soul,", "Struggling in desperation,", "Living a life with brittle fragments of anguish,", "The world oblivious to your pretence,", "Unknown to your plights,", "Engulfed in the role you played,", "Until the ruse was no longer true,", "When the mask fell,", "It rained as though a violent spell cast its day,", "Although the tattoo was just giving way to the bugles,", "Today I realise, the glimmer in your eyes was just tears in disguise,", "The world you once thought would mock,", "Came with mournful wreaths,", "Reverence for you still lingers in the air,", "The bugle blows and bells ring now, and in remembrance always will."]]}, {"slug": "unforgettable", "title": "Could he be any more unforgettable?", "group": "perry", "stanzas": [["When the world was rejoicing in your cessation,", "A quiet necrosis took over your life,", "Trying to dissipate the new storm,", "The desperate cure of yours was instead your bane."], ["The queen of shadows sold you sleep, and kept the dawn,", "She scorned your soul and handed you eternal sleep,", "She dealt in dreams disguised as peace,", "Every fantasy hummed the silent song of death."], ["Once the last bell rang, the last prayer faded into sleep,", "The world woke up to an abandoned temple,", "Wrathful devotees made the sacred walls tremble with fear,", "And the queen quivered with divine reckoning."], ["Soon, the empress had to face the bench,", "With every fault exposed, she grew smaller still,", "Until her pride was burnt to ash,", "The gavel was finally hit; her hands bound forever in iron, and for you, ‘Could you be any more unforgettable?’"]]}];
+const app = document.getElementById("app");
+const DEDICATION = "These elegies are dedicated to the life of Matthew Perry, who was popularly known for his role as Chandler Bing in the famous TV show F.R.I.E.N.D.S. Although he made millions of people laugh, he quietly struggled with addiction and emotional pain for many years. The poems reflect the sadness hidden behind his smile and the difference between the happy person the world saw and the pain he felt inside. They also show how, after his death, people around the world remembered him with love, respect, and gratitude for the joy he brought into their lives.";
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const li = (p, n) => `<li><span class="n">${n}.</span><a href="#${p.slug}">${esc(p.title)}</a></li>`;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const PAGES = {
+  about: `<div class="page about"><h1>About</h1><p>Hi, I’m Sara - a student, reader, and writer who is still figuring things out.</p><p>I write about the things I feel, notice, and sometimes struggle to say out loud: growing up, friendships, emotions, identity, and the expectations we face. Writing is my way of making sense of my thoughts and turning them into something I can share.</p><p>I don’t have everything figured out, and I don’t think I need to. I’m simply learning, growing, and finding my voice - one word at a time.</p></div>`,
+  contact: `<div class="page"><h1>Contact</h1><p class="mail"><a href="mailto:sarapaleja@gmail.com">sarapaleja@gmail.com</a><button type="button" class="copy" id="copy">Copy</button></p></div>`
+};
+
+function home() {
+  const main = POEMS.filter(p => p.group === "main"), perry = POEMS.filter(p => p.group === "perry");
+  return `<div class="cover"><h1>Sara Paleja</h1><p>Poems</p></div>
+    <div class="list">
+      <ol>${main.map((p, i) => li(p, i + 1)).join("")}</ol>
+      <h2>For Matthew Perry</h2>
+      <p class="dedication">${DEDICATION}</p>
+      <ol>${perry.map((p, i) => li(p, main.length + i + 1)).join("")}</ol>
+    </div>`;
+}
+
+function poem(p) {
+  const i = POEMS.indexOf(p), next = POEMS[i + 1];
+  const verse = p.stanzas.map(s => `<p>${s.map(l => `<span>${esc(l)}</span>`).join("")}</p>`).join("");
+  return `<article class="leaf">
+      ${p.group === "perry" ? `<p class="for">For Matthew Perry</p>` : ""}
+      <h1>${esc(p.title)}</h1>
+      <div class="verse">${verse}</div>
+    </article>
+    <nav class="turn" aria-label="More poems">
+      <a href="#">All poems</a>
+      ${next ? `<a class="next" href="#${next.slug}">${esc(next.title)}</a>` : ""}
+    </nav>`;
+}
+
+function render() {
+  const slug = location.hash.slice(1);
+  const p = POEMS.find(x => x.slug === slug);
+  app.innerHTML = p ? poem(p) : (PAGES[slug] || home());
+  document.title = p ? `${p.title} · Sara Paleja` : "Sara Paleja Poems";
+  const current = PAGES[slug] ? slug : (p ? null : "");
+  document.documentElement.setAttribute("data-view", current === "" ? "home" : "other");
+  document.querySelectorAll("[data-nav]").forEach(a =>
+    a.dataset.nav === current ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+}
+
+let first = true;
+function route() {
+  if (first || reduce) { render(); first = false; return; }
+  app.classList.add("out");
+  setTimeout(() => {
+    render();
+    window.scrollTo({ top: 0 });
+    app.classList.remove("out");
+    app.classList.add("in");
+    requestAnimationFrame(() => requestAnimationFrame(() => app.classList.remove("in")));
+  }, 180);
+}
+addEventListener("hashchange", route);
+app.addEventListener("click", e => {
+  const b = e.target.closest("#copy");
+  if (!b) return;
+  const done = () => { b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy"; }, 1600); };
+  const select = () => { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+  try { navigator.clipboard.writeText("sarapaleja@gmail.com").then(done, select); } catch (err) { select(); }
+});
+route();
+
+/* Light / dark setting: follows the device until the reader picks one. */
+const root = document.documentElement, btn = document.getElementById("mode");
+const sys = matchMedia("(prefers-color-scheme: dark)");
+const isDark = () => root.getAttribute("data-mode") === "dark";
+function sync() {
+  const d = isDark();
+  root.setAttribute("data-dark", d ? "1" : "0");
+  btn.setAttribute("aria-label", d ? "Switch to light mode" : "Switch to dark mode");
+}
+try { if (localStorage.getItem("sp-mode") === "dark") root.setAttribute("data-mode", "dark"); } catch (e) {}
+btn.addEventListener("click", () => {
+  const t = isDark() ? "light" : "dark";
+  root.setAttribute("data-mode", t);
+  try { localStorage.setItem("sp-mode", t); } catch (e) {}
+  sync();
+});
+sync();
+</script>
+</body>
+</html>
