@@ -230,7 +230,7 @@ sync();
     position: fixed;
     bottom: 74px;
     right: 24px;
-    width: 330px;
+    width: 340px;
     max-width: calc(100vw - 48px);
     background: var(--paper, #FDFBF7);
     color: var(--ink, #1A1A1A);
@@ -253,15 +253,61 @@ sync();
     align-items: center;
   }
   #chat-log {
-    height: 220px;
+    height: 230px;
     overflow-y: auto;
-    font-size: 15px;
+    font-size: 14.5px;
     line-height: 1.55;
     padding-right: 4px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   .chat-msg { margin-bottom: 10px; }
   .chat-user { color: var(--hover, #7A2E24); }
+  .bot-chip {
+    display: inline-block;
+    margin: 4px 4px 0 0;
+    padding: 5px 10px;
+    font-family: var(--ui, sans-serif);
+    font-size: 12px;
+    border: 1px solid var(--quiet, #7A746D);
+    border-radius: 14px;
+    background: transparent;
+    color: var(--ink, #1A1A1A);
+    cursor: pointer;
+  }
+  .bot-chip:hover {
+    border-color: var(--hover, #7A2E24);
+    color: var(--hover, #7A2E24);
+  }
+  .signin-card {
+    padding: 10px;
+    border: 1px solid rgba(122, 116, 109, 0.35);
+    border-radius: 8px;
+    margin-top: 6px;
+    font-family: var(--ui, sans-serif);
+    font-size: 12.5px;
+  }
+  .signin-card input {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 6px;
+    padding: 6px 8px;
+    border: 1px solid var(--quiet, #7A746D);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--ink, #1A1A1A);
+    font-size: 12.5px;
+  }
+  .signin-btn {
+    margin-top: 8px;
+    width: 100%;
+    padding: 7px;
+    border: none;
+    border-radius: 5px;
+    background: var(--ink, #1A1A1A);
+    color: var(--paper, #FDFBF7);
+    cursor: pointer;
+    font-size: 12.5px;
+  }
   #chat-controls {
     display: flex;
     gap: 8px;
@@ -295,28 +341,40 @@ sync();
 <div id="poetry-bot">
   <div id="poetry-bot-header">
     <span>Poetry Guide</span>
-    <span id="poetry-close" style="cursor:pointer; font-family:var(--ui, sans-serif); font-size:14px; color:var(--quiet);">✕</span>
+    <div>
+      <span id="reader-badge" style="font-family:var(--ui, sans-serif); font-size:11px; color:var(--quiet); margin-right:8px;"></span>
+      <span id="poetry-close" style="cursor:pointer; font-family:var(--ui, sans-serif); font-size:14px; color:var(--quiet);">✕</span>
+    </div>
   </div>
   <div id="chat-log"></div>
   <div id="chat-controls">
-    <input id="chat-input" type="text" placeholder="Ask about a poem or type a word..." />
+    <input id="chat-input" type="text" placeholder="Ask about a poem or play Finish the Line..." />
     <button id="chat-send">Send</button>
   </div>
 </div>
 
 <script>
 (() => {
+  const SARA_EMAIL = "sarapaleja@gmail.com";
+
   const toggleBtn = document.getElementById("poetry-toggle");
   const closeBtn = document.getElementById("poetry-close");
   const botBox = document.getElementById("poetry-bot");
   const log = document.getElementById("chat-log");
   const input = document.getElementById("chat-input");
   const sendBtn = document.getElementById("chat-send");
+  const readerBadge = document.getElementById("reader-badge");
 
-  // 1. Customize your bio here:
+  let reader = JSON.parse(localStorage.getItem("sp_reader") || "null");
+  let gameState = { active: false, line1: "", rhymeKey: "" };
+  let lastCompletedPoem = "";
+
+  if (reader) {
+    readerBadge.textContent = `Hi, ${reader.name}`;
+  }
+
   const authorBio = "Sara Paleja is a poet whose work explores memory, sea imagery, quiet longing, freedom, and heartfelt tributes—including elegies dedicated to Matthew Perry.";
 
-  // 2. Line of the Day rotation:
   const dailyVerses = [
     "“In the quiet between waves, memory finds its voice.” — Inspired by Along The Sea",
     "“To let go is not to fall, but to finally learn the air.” — Inspired by Falling To Freedom",
@@ -326,7 +384,6 @@ sync();
   ];
   const todayVerse = dailyVerses[new Date().getDate() % dailyVerses.length];
 
-  // 3. Poem catalog for summaries & mood matching:
   const poemCatalog = [
     { title: "As I Look...", moods: ["reflective", "observant", "calm", "introspective"], summary: "A reflective piece exploring perspective, quiet observation, and inner stillness." },
     { title: "As I Wait...", moods: ["patient", "longing", "hopeful", "nostalgic"], summary: "Captures the quiet tension and emotion of anticipation and waiting." },
@@ -339,122 +396,61 @@ sync();
     { title: "Could he be any more unforgettable?", moods: ["tribute", "matthew perry", "nostalgic", "love", "memory", "grateful"], summary: "Celebrates Matthew Perry's iconic charm and the gratitude fans around the world feel for his life." }
   ];
 
-  // 4. Co-Creative 4-Line Stanza Generator (inspired by Sara's style)
-  function composeStanza(topic) {
-    const cleanTopic = topic.replace(/[^a-zA-Z\s]/g, "").trim() || "silence";
-    const openings = [
-      `Beneath the quiet pull of ${cleanTopic},`,
-      `Along the tide where ${cleanTopic} lingers,`,
-      `I watched the shadow of ${cleanTopic} drift,`,
-      `Between the waves, a trace of ${cleanTopic}`
-    ];
-    const middles = [
-      `the heart remembers what the hands let go,`,
-      `like sweet old habits woven into dusk,`,
-      `a fragile light still learning how to breathe,`,
-      `and every silence holds an unsung name,`
-    ];
-    const turns = [
-      `falling softly toward a wider sky—`,
-      `as deep as oceans no one ever mapped—`,
-      `where memory turns heavy things to grace—`,
-      `unafraid of what the dark may keep—`
-    ];
-    const endings = [
-      `and finds its freedom waiting in the quiet.`,
-      `until ${cleanTopic} becomes a song we keep.`,
-      `a gentle tide that brings us home again.`,
-      `still glowing softly after we move on.`
+  const openingPrompts = [
+    { line: "Along the quiet edge of midnight tide,", rhyme: "tide" },
+    { line: "We kept the sweetest habits in the rain,", rhyme: "rain" },
+    { line: "Beneath a sky too wide for us to hold,", rhyme: "hold" },
+    { line: "Some memories still echo in the dark,", rhyme: "dark" },
+    { line: "I watched the silver water kiss the shore,", rhyme: "shore" }
+  ];
+
+  function completeStanza(line1, line2) {
+    const clean2 = line2.replace(/[^a-zA-Z\s]/g, "").trim().toLowerCase();
+    const lastWord = clean2.split(/\s+/).pop() || "night";
+
+    const rhymePairs = [
+      { test: /(ight|ite|ide|y|ie)$/, l3: "where every unspoken wish begins to take flight,", l4: "and softly turns our shadows into light." },
+      { test: /(ain|ane|ay|ey|eigh)$/, l3: "like gentle footsteps fading down the lane,", l4: "leaving behind a song that will remain." },
+      { test: /(ore|oor|oar|all|oul|old)$/, l3: "with quiet truths we never told before,", l4: "still lingering beside the open door." },
+      { test: /(ark|eart|art|ar)$/, l3: "a fragile ember glowing in the dark,", l4: "that lights the quiet chambers of the heart." },
+      { test: /(ea|ee|e|me|be|free)$/, l3: "drifting outward toward an endless sea,", l4: "where heavy hearts at last are set free." },
+      { test: /(ove|ome|one|own|oon)$/, l3: "under the quiet silver of the moon,", l4: "knowing that dawn will find us all too soon." }
     ];
 
-    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-    return `<i>${pick(openings)}<br>${pick(middles)}<br>${pick(turns)}<br>${pick(endings)}</i>`;
+    const match = rhymePairs.find(r => r.test.test(lastWord)) || {
+      l3: `carrying echoes of "${lastWord}" through the air,`,
+      l4: "a shared verse woven gently out of care."
+    };
+
+    return `${line1}\n${line2}\n${match.l3}\n${match.l4}`;
   }
 
-  // Show Line of the Day + Welcome Message immediately
   log.innerHTML = `
     <div style="padding:8px; margin-bottom:10px; border-left:2px solid var(--hover, #7A2E24); font-style:italic; font-size:13px;">
       <b>Line of the Day:</b><br>${todayVerse}
     </div>
-    <div>Welcome! Try asking:<br>
-    • <b>"Write a poem about rain"</b> (or any word)<br>
-    • <b>"Recommend a nostalgic poem"</b><br>
-    • <b>"What is Along The Sea about?"</b><br>
-    • <b>"Tell me about Sara"</b></div>
+    <div>Welcome! Explore Sara's poems or co-write a stanza together:</div>
+    <div style="margin-top:6px;">
+      <button class="bot-chip" data-cmd="finish the line">✍️ Finish the Line Game</button>
+      <button class="bot-chip" data-cmd="recommend nostalgic">🌊 Mood Match</button>
+      <button class="bot-chip" data-cmd="about sara">📖 About Sara</button>
+    </div>
   `;
+
+  log.addEventListener("click", (e) => {
+    if (e.target.classList.contains("bot-chip")) {
+      const cmd = e.target.getAttribute("data-cmd");
+      if (cmd === "email_sara") {
+        sendPoemEmail(e.target);
+      } else {
+        input.value = cmd;
+        sendMessage();
+      }
+    }
+  });
 
   toggleBtn.addEventListener("click", () => {
     const isHidden = botBox.style.display === "none" || botBox.style.display === "";
-    botBox.style.display = isHidden ? "block" : "none";
-    if (isHidden) input.focus();
-  });
-
-  closeBtn.addEventListener("click", () => {
-    botBox.style.display = "none";
-  });
-
-  function generateReply(query) {
-    const q = query.toLowerCase();
-
-    // 1. Co-Creative Poetry Request
-    const writeMatch = q.match(/(?:write|create|compose|poem about|stanza about|verse about|inspire)\s+(?:a\s+poem\s+about\s+|a\s+stanza\s+about\s+|about\s+|on\s+)?(.+)/i);
-    if (writeMatch || q.startsWith("write ") || q.startsWith("poem ")) {
-     const topic = writeMatch ? writeMatch[1] : q.replace(/^(write|poem)\s+/i, "");
-      return `Here is a 4-line verse inspired by <b>"${topic}"</b> in Sara's style:<br><br>${composeStanza(topic)}`;
-    }
-
-    // 2. Line of the Day request
-    if (q.includes("daily") || q.includes("line of the day") || q.includes("quote")) {
-      return `<b>Today's Line:</b><br><i>${todayVerse}</i>`;
-    }
-
-    // 3. Bio / Author questions
-    if (q.includes("who") || q.includes("bio") || q.includes("sara") || q.includes("author") || (q.includes("about") && !q.includes("what is"))) {
-      return `<b>About Sara Paleja:</b> ${authorBio}`;
-    }
-
-    // 4. Specific Poem Title Lookup
-    const titleMatch = poemCatalog.find(p => q.includes(p.title.toLowerCase().replace(/\.\.\.|\?/g, "").trim()));
-    if (titleMatch) {
-      return `<b>"${titleMatch.title}"</b><br>${titleMatch.summary}<br><i>Themes: ${titleMatch.moods.join(", ")}</i>`;
-    }
-
-    // 5. Matthew Perry Elegies
-    if (q.includes("matthew") || q.includes("perry") || q.includes("chandler") || q.includes("elegy") || q.includes("elegies")) {
-      return `Sara wrote three elegies dedicated to <b>Matthew Perry</b>:<br>• <i>An Ode To The One We Will Never Forget</i><br>• <i>An Ode To The One With The Life He Never Wanted</i><br>• <i>Could he be any more unforgettable?</i><br>Ask about any title for its summary!`;
-    }
-
-    // 6. Mood / Theme Recommendations
-    const moodMatches = poemCatalog.filter(p => p.moods.some(m => q.includes(m)));
-    if (moodMatches.length > 0) {
-      const picks = moodMatches.slice(0, 3).map(p => `• <b>${p.title}</b> — ${p.summary}`).join("<br>");
-      return `Here are poems matching that mood:<br>${picks}`;
-    }
-          // 7. Single-word feeling/topic fallback -> Co-create a stanza!
-    if (query.trim().split(/\s+/).length <= 2) {
-      return `Here is a short verse woven around <b>"${query.trim()}"</b>:<br><br>${composeStanza(query.trim())}`;
-    }
-
-    return `I can recommend poems by mood, explain Sara's pieces, or write a 4-line stanza! Try typing <b>"write a poem about midnight"</b> or ask about any poem on the page.`;
-  }
-
-  function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    input.value = "";
-    log.innerHTML += `<div class="chat-msg chat-user"><b>You:</b> ${text}</div>`;
-
-    const replyDiv = document.createElement("div");
-    replyDiv.className = "chat-msg";
-    replyDiv.innerHTML = `<b>Guide:</b> ${generateReply(text)}`;
-    log.appendChild(replyDiv);
-    log.scrollTop = log.scrollHeight;
-  }
-
-  sendBtn.addEventListener("click", sendMessage);
-  input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
-})();
 </script>
 </body>
 </html>
