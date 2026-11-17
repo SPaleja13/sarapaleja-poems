@@ -543,33 +543,6 @@ sync();
       btnEl.parentElement.appendChild(gmailBtn);
     }
   }
-    if (!lastCompletedPoem || !reader) return;
-    btnEl.disabled = true;
-    btnEl.textContent = "Sending to Sara...";
-
-    try {
-      const res = await fetch(`https://formsubmit.co{SARA_EMAIL}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({
-          _subject: `New Co-Written Poem from ${reader.name}!`,
-          Reader_Name: reader.name,
-          Reader_Email: reader.email,
-          Collaborative_Poem: lastCompletedPoem
-        })
-      });
-      if (res.ok) {
-        btnEl.textContent = "✓ Emailed to Sara!";
-      } else {
-        throw new Error("FormSubmit error");
-      }
-    } catch (err) {
-      const mailto = `mailto:${SARA_EMAIL}?subject=${encodeURIComponent("Co-Written Poem from " + reader.name)}&body=${encodeURIComponent("Reader: " + reader.name + " (" + reader.email + ")\n\n" + lastCompletedPoem)}`;
-      window.location.href = mailto;
-      btnEl.textContent = "Opened Email App";
-    }
-  }
-
   function generateReply(query) {
     const q = query.toLowerCase().trim();
 
