@@ -514,7 +514,7 @@ sync();
   function generateReply(query) {
     const q = query.toLowerCase().trim();
 
-      if (gameState.active) {
+       if (gameState.active) {
       gameState.active = false;
       input.placeholder = "Ask about a poem or play Finish the Line...";
       const fullPoem = completeStanza(gameState.line1, query.trim());
@@ -528,7 +528,8 @@ sync();
         <div style="padding:8px; border-left:2px solid var(--hover, #7A2E24); font-style:italic;">
           ${fullPoem.replace(/\n/g, "<br>")}
         </div>
-        <a href="${gmailUrl}" target="_blank" class="bot-chip" style="text-decoration:none;">✉️ Email This Poem to Sara</a>
+        <a href="${gmailUrl}" class="bot-chip" style="text-decoration:none;">✉️ Open in Gmail</a>
+        <button class="bot-chip" onclick="navigator.clipboard.writeText(this.dataset.poem); this.textContent='✓ Copied!'" data-poem="${body.replace(/"/g, '&quot;')}">📋 Copy Poem</button>
         <button class="bot-chip" data-cmd="finish the line">🔄 Play Again</button>`;
     }
 
