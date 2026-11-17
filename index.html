@@ -304,10 +304,7 @@ sync();
     <button id="chat-send" disabled>Send</button>
   </div>
 </div>
-
-<script type="module">
-  import * as webllm from "https://esm.run";
-
+<script>
   const toggleBtn = document.getElementById("poetry-toggle");
   const closeBtn = document.getElementById("poetry-close");
   const botBox = document.getElementById("poetry-bot");
@@ -344,15 +341,16 @@ sync();
     }
   ];
 
-  // Only load the AI model when the visitor actually opens the chat
+  // Open the chat box immediately when clicked
   toggleBtn.addEventListener("click", async () => {
     const isHidden = botBox.style.display === "none" || botBox.style.display === "";
     botBox.style.display = isHidden ? "block" : "none";
 
     if (!engine && !isLoading) {
       isLoading = true;
-      log.innerHTML = "<i>Preparing the literary guide (takes ~15s the first time)...</i>";
+      log.innerHTML = "<i>Connecting to AI library...</i>";
       try {
+        const webllm = await import("https://esm.run");
         engine = await webllm.CreateMLCEngine("Llama-3.2-1B-Instruct-q4f16_1-MLC", {
           initProgressCallback: (report) => {
             log.innerHTML = `<i>Loading guide: ${Math.round(report.progress * 100)}%</i>`;
@@ -363,7 +361,7 @@ sync();
         btn.disabled = false;
         input.focus();
       } catch (err) {
-        log.innerHTML = "Sorry, your browser doesn't support local AI (requires Chrome or Edge with WebGPU enabled).";
+        log.innerHTML = "Could not load local AI: " + err.message;
       }
     }
   });
@@ -387,7 +385,7 @@ sync();
     log.scrollTop = log.scrollHeight;
 
     const reply = await engine.chat.completions.create({ messages });
-    const botText = reply.choices[0].message.content;
+    const botText = reply.choices.message.content;
 
     replyDiv.innerHTML = `<b>Guide:</b> ${botText}`;
     messages.push({ role: "assistant", content: botText });
@@ -396,6 +394,6 @@ sync();
 
   btn.addEventListener("click", sendMessage);
   input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
-</script>
+</script>	
 </body>
 </html>
