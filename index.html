@@ -202,6 +202,108 @@ btn.addEventListener("click", () => {
   sync();
 });
 sync();
+</script>
+<!-- Custom Book-Style Poetry Assistant -->
+<style>
+  #poetry-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--paper, #FDFBF7);
+    color: var(--ink, #1A1A1A);
+    border: 1px solid var(--quiet, #7A746D);
+    font-family: var(--ui, sans-serif);
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transition: all 0.3s var(--ease, ease);
+    z-index: 9999;
+  }
+  #poetry-toggle:hover {
+    border-color: var(--hover, #7A2E24);
+    color: var(--hover, #7A2E24);
+  }
+  #poetry-bot {
+    display: none;
+    position: fixed;
+    bottom: 74px;
+    right: 24px;
+    width: 330px;
+    max-width: calc(100vw - 48px);
+    background: var(--paper, #FDFBF7);
+    color: var(--ink, #1A1A1A);
+    border: 1px solid var(--quiet, #7A746D);
+    border-radius: 12px;
+    padding: 16px;
+    font-family: var(--body, Georgia, serif);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    z-index: 9999;
+  }
+  #poetry-bot-header {
+    font-family: var(--display, Georgia, serif);
+    font-size: 18px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(122, 116, 109, 0.25);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #chat-log {
+    height: 220px;
+    overflow-y: auto;
+    font-size: 15px;
+    line-height: 1.55;
+    padding-right: 4px;
+    margin-bottom: 12px;
+  }
+  .chat-msg { margin-bottom: 10px; }
+  .chat-user { color: var(--hover, #7A2E24); }
+  #chat-controls {
+    display: flex;
+    gap: 8px;
+    border-top: 1px solid rgba(122, 116, 109, 0.25);
+    padding-top: 10px;
+  }
+  #chat-input {
+    flex: 1;
+    background: transparent;
+    color: var(--ink, #1A1A1A);
+    border: 1px solid var(--quiet, #7A746D);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-family: var(--ui, sans-serif);
+    font-size: 13px;
+  }
+  #chat-send {
+    background: var(--ink, #1A1A1A);
+    color: var(--paper, #FDFBF7);
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-family: var(--ui, sans-serif);
+    font-size: 13px;
+    cursor: pointer;
+  }
+</style>
+
+<button id="poetry-toggle">Ask the Poetry Guide</button>
+
+<div id="poetry-bot">
+  <div id="poetry-bot-header">
+    <span>Poetry Guide</span>
+    <span id="poetry-close" style="cursor:pointer; font-family:var(--ui, sans-serif); font-size:14px; color:var(--quiet);">✕</span>
+  </div>
+  <div id="chat-log"></div>
+  <div id="chat-controls">
+    <input id="chat-input" type="text" placeholder="Ask about a poem or type a word..." />
+    <button id="chat-send">Send</button>
+  </div>
+</div>
+
 <script>
 (() => {
   const toggleBtn = document.getElementById("poetry-toggle");
@@ -280,8 +382,6 @@ sync();
     • <b>"What is Along The Sea about?"</b><br>
     • <b>"Tell me about Sara"</b></div>
   `;
-  input.disabled = false;
-  sendBtn.disabled = false;
 
   toggleBtn.addEventListener("click", () => {
     const isHidden = botBox.style.display === "none" || botBox.style.display === "";
@@ -299,7 +399,7 @@ sync();
     // 1. Co-Creative Poetry Request
     const writeMatch = q.match(/(?:write|create|compose|poem about|stanza about|verse about|inspire)\s+(?:a\s+poem\s+about\s+|a\s+stanza\s+about\s+|about\s+|on\s+)?(.+)/i);
     if (writeMatch || q.startsWith("write ") || q.startsWith("poem ")) {
-      const topic = writeMatch ? writeMatch[1] : q.replace(/^(write|poem)\s+/i, "");
+      const topic = writeMatch ? writeMatch : q.replace(/^(write|poem)\s+/i, "");
       return `Here is a 4-line verse inspired by <b>"${topic}"</b> in Sara's style:<br><br>${composeStanza(topic)}`;
     }
 
@@ -309,7 +409,7 @@ sync();
     }
 
     // 3. Bio / Author questions
-    if (q.includes("who") || q.includes("bio") || q.includes("sara") || q.includes("author") || q.includes("about") && !q.includes("what is")) {
+    if (q.includes("who") || q.includes("bio") || q.includes("sara") || q.includes("author") || (q.includes("about") && !q.includes("what is"))) {
       return `<b>About Sara Paleja:</b> ${authorBio}`;
     }
 
@@ -330,8 +430,7 @@ sync();
       const picks = moodMatches.slice(0, 3).map(p => `• <b>${p.title}</b> — ${p.summary}`).join("<br>");
       return `Here are poems matching that mood:<br>${picks}`;
     }
-
-    // 7. Single-word feeling/topic fallback -> Co-create a stanza!
+          // 7. Single-word feeling/topic fallback -> Co-create a stanza!
     if (query.trim().split(/\s+/).length <= 2) {
       return `Here is a short verse woven around <b>"${query.trim()}"</b>:<br><br>${composeStanza(query.trim())}`;
     }
