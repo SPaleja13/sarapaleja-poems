@@ -202,108 +202,6 @@ btn.addEventListener("click", () => {
   sync();
 });
 sync();
-</script>
-<!-- Custom Book-Style Poetry Assistant -->
-<style>
-  #poetry-toggle {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--paper, #FDFBF7);
-    color: var(--ink, #1A1A1A);
-    border: 1px solid var(--quiet, #7A746D);
-    font-family: var(--ui, sans-serif);
-    font-size: 14px;
-    padding: 10px 16px;
-    border-radius: 24px;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    transition: all 0.3s var(--ease, ease);
-    z-index: 9999;
-  }
-  #poetry-toggle:hover {
-    border-color: var(--hover, #7A2E24);
-    color: var(--hover, #7A2E24);
-  }
-  #poetry-bot {
-    display: none;
-    position: fixed;
-    bottom: 74px;
-    right: 24px;
-    width: 330px;
-    max-width: calc(100vw - 48px);
-    background: var(--paper, #FDFBF7);
-    color: var(--ink, #1A1A1A);
-    border: 1px solid var(--quiet, #7A746D);
-    border-radius: 12px;
-    padding: 16px;
-    font-family: var(--body, Georgia, serif);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    z-index: 9999;
-  }
-  #poetry-bot-header {
-    font-family: var(--display, Georgia, serif);
-    font-size: 18px;
-    font-weight: bold;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid rgba(122, 116, 109, 0.25);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  #chat-log {
-    height: 220px;
-    overflow-y: auto;
-    font-size: 15px;
-    line-height: 1.55;
-    padding-right: 4px;
-    margin-bottom: 12px;
-  }
-  .chat-msg { margin-bottom: 10px; }
-  .chat-user { color: var(--hover, #7A2E24); }
-  #chat-controls {
-    display: flex;
-    gap: 8px;
-    border-top: 1px solid rgba(122, 116, 109, 0.25);
-    padding-top: 10px;
-  }
-  #chat-input {
-    flex: 1;
-    background: transparent;
-    color: var(--ink, #1A1A1A);
-    border: 1px solid var(--quiet, #7A746D);
-    border-radius: 6px;
-    padding: 7px 10px;
-    font-family: var(--ui, sans-serif);
-    font-size: 13px;
-  }
-  #chat-send {
-    background: var(--ink, #1A1A1A);
-    color: var(--paper, #FDFBF7);
-    border: none;
-    border-radius: 6px;
-    padding: 7px 14px;
-    font-family: var(--ui, sans-serif);
-    font-size: 13px;
-    cursor: pointer;
-  }
-  #chat-send:disabled, #chat-input:disabled { opacity: 0.5; }
-</style>
-
-<button id="poetry-toggle">Ask the Poetry Guide</button>
-
-<div id="poetry-bot">
-  <div id="poetry-bot-header">
-    <span>Poetry Guide</span>
-    <span id="poetry-close" style="cursor:pointer; font-family:var(--ui, sans-serif); font-size:14px; color:var(--quiet);">✕</span>
-  </div>
-  <div id="chat-log">Click below or ask a question once the guide wakes up...</div>
-  <div id="chat-controls">
-    <input id="chat-input" type="text" placeholder="Ask about a poem or mood..." disabled />
-    <button id="chat-send" disabled>Send</button>
-  </div>
-</div>
 <script>
 (() => {
   const toggleBtn = document.getElementById("poetry-toggle");
@@ -314,13 +212,23 @@ sync();
   const sendBtn = document.getElementById("chat-send");
 
   // 1. Customize your bio here:
-  const authorBio = "Sara Paleja is a poet whose work explores memory, emotion, sea imagery, freedom, and heartfelt tributes—including elegies dedicated to Matthew Perry.";
+  const authorBio = "Sara Paleja is a poet whose work explores memory, sea imagery, quiet longing, freedom, and heartfelt tributes—including elegies dedicated to Matthew Perry.";
 
-  // 2. Poem catalog & themes (add or edit descriptions for any poem anytime):
+  // 2. Line of the Day rotation:
+  const dailyVerses = [
+    "“In the quiet between waves, memory finds its voice.” — Inspired by Along The Sea",
+    "“To let go is not to fall, but to finally learn the air.” — Inspired by Falling To Freedom",
+    "“Even in the deepest hadal dark, the heart remembers light.” — Inspired by The Journey To The Hadal Heart",
+    "“Sweet habits linger like warm tea on a rainy afternoon.” — Inspired by Sweet Habits",
+    "“Laughter lingers long after the curtain falls.” — In memory of Matthew Perry"
+  ];
+  const todayVerse = dailyVerses[new Date().getDate() % dailyVerses.length];
+
+  // 3. Poem catalog for summaries & mood matching:
   const poemCatalog = [
     { title: "As I Look...", moods: ["reflective", "observant", "calm", "introspective"], summary: "A reflective piece exploring perspective, quiet observation, and inner stillness." },
     { title: "As I Wait...", moods: ["patient", "longing", "hopeful", "nostalgic"], summary: "Captures the quiet tension and emotion of anticipation and waiting." },
-    { title: "Along The Sea", moods: ["nature", "ocean", "peaceful", "calm", "nostalgic"], summary: "Uses imagery of the sea to reflect on depth, movement, and serenity." },
+    { title: "Along The Sea", moods: ["nature", "ocean", "sea", "peaceful", "calm", "nostalgic"], summary: "Uses imagery of the sea to reflect on depth, movement, and serenity." },
     { title: "Falling To Freedom", moods: ["freedom", "inspiring", "emotional", "letting go", "sad"], summary: "Explores the release of letting go and finding liberation through vulnerability." },
     { title: "The Journey To The Hadal Heart", moods: ["deep", "emotional", "introspective", "sad", "dark"], summary: "A profound dive into the deepest, hidden chambers of the human heart." },
     { title: "Sweet Habits", moods: ["nostalgic", "warm", "love", "comfort", "reflective"], summary: "Looks at the comforting routines and small moments that stay with us." },
@@ -329,8 +237,49 @@ sync();
     { title: "Could he be any more unforgettable?", moods: ["tribute", "matthew perry", "nostalgic", "love", "memory", "grateful"], summary: "Celebrates Matthew Perry's iconic charm and the gratitude fans around the world feel for his life." }
   ];
 
-  // Enable input immediately
-  log.innerHTML = "Welcome! Ask me about <b>Sara's bio</b>, ask for a <b>poem recommendation by mood</b> (e.g., <i>sad, nature, nostalgic, tribute</i>), or ask what a specific poem is about.";
+  // 4. Co-Creative 4-Line Stanza Generator (inspired by Sara's style)
+  function composeStanza(topic) {
+    const cleanTopic = topic.replace(/[^a-zA-Z\s]/g, "").trim() || "silence";
+    const openings = [
+      `Beneath the quiet pull of ${cleanTopic},`,
+      `Along the tide where ${cleanTopic} lingers,`,
+      `I watched the shadow of ${cleanTopic} drift,`,
+      `Between the waves, a trace of ${cleanTopic}`
+    ];
+    const middles = [
+      `the heart remembers what the hands let go,`,
+      `like sweet old habits woven into dusk,`,
+      `a fragile light still learning how to breathe,`,
+      `and every silence holds an unsung name,`
+    ];
+    const turns = [
+      `falling softly toward a wider sky—`,
+      `as deep as oceans no one ever mapped—`,
+      `where memory turns heavy things to grace—`,
+      `unafraid of what the dark may keep—`
+    ];
+    const endings = [
+      `and finds its freedom waiting in the quiet.`,
+      `until ${cleanTopic} becomes a song we keep.`,
+      `a gentle tide that brings us home again.`,
+      `still glowing softly after we move on.`
+    ];
+
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    return `<i>${pick(openings)}<br>${pick(middles)}<br>${pick(turns)}<br>${pick(endings)}</i>`;
+  }
+
+  // Show Line of the Day + Welcome Message immediately
+  log.innerHTML = `
+    <div style="padding:8px; margin-bottom:10px; border-left:2px solid var(--hover, #7A2E24); font-style:italic; font-size:13px;">
+      <b>Line of the Day:</b><br>${todayVerse}
+    </div>
+    <div>Welcome! Try asking:<br>
+    • <b>"Write a poem about rain"</b> (or any word)<br>
+    • <b>"Recommend a nostalgic poem"</b><br>
+    • <b>"What is Along The Sea about?"</b><br>
+    • <b>"Tell me about Sara"</b></div>
+  `;
   input.disabled = false;
   sendBtn.disabled = false;
 
@@ -347,36 +296,47 @@ sync();
   function generateReply(query) {
     const q = query.toLowerCase();
 
-    // Check for bio / author questions
-    if (q.includes("who") || q.includes("bio") || q.includes("sara") || q.includes("author") || q.includes("about you") || q.includes("style")) {
+    // 1. Co-Creative Poetry Request
+    const writeMatch = q.match(/(?:write|create|compose|poem about|stanza about|verse about|inspire)\s+(?:a\s+poem\s+about\s+|a\s+stanza\s+about\s+|about\s+|on\s+)?(.+)/i);
+    if (writeMatch || q.startsWith("write ") || q.startsWith("poem ")) {
+      const topic = writeMatch ? writeMatch[1] : q.replace(/^(write|poem)\s+/i, "");
+      return `Here is a 4-line verse inspired by <b>"${topic}"</b> in Sara's style:<br><br>${composeStanza(topic)}`;
+    }
+
+    // 2. Line of the Day request
+    if (q.includes("daily") || q.includes("line of the day") || q.includes("quote")) {
+      return `<b>Today's Line:</b><br><i>${todayVerse}</i>`;
+    }
+
+    // 3. Bio / Author questions
+    if (q.includes("who") || q.includes("bio") || q.includes("sara") || q.includes("author") || q.includes("about") && !q.includes("what is")) {
       return `<b>About Sara Paleja:</b> ${authorBio}`;
     }
 
-    // Check if asking about a specific poem title
+    // 4. Specific Poem Title Lookup
     const titleMatch = poemCatalog.find(p => q.includes(p.title.toLowerCase().replace(/\.\.\.|\?/g, "").trim()));
     if (titleMatch) {
       return `<b>"${titleMatch.title}"</b><br>${titleMatch.summary}<br><i>Themes: ${titleMatch.moods.join(", ")}</i>`;
     }
 
-    // Check for Matthew Perry elegies
+    // 5. Matthew Perry Elegies
     if (q.includes("matthew") || q.includes("perry") || q.includes("chandler") || q.includes("elegy") || q.includes("elegies")) {
-      return `Sara wrote three elegies dedicated to <b>Matthew Perry</b>:<br>• <i>An Ode To The One We Will Never Forget</i><br>• <i>An Ode To The One With The Life He Never Wanted</i><br>• <i>Could he be any more unforgettable?</i><br>Ask me about any of these titles for a summary!`;
+      return `Sara wrote three elegies dedicated to <b>Matthew Perry</b>:<br>• <i>An Ode To The One We Will Never Forget</i><br>• <i>An Ode To The One With The Life He Never Wanted</i><br>• <i>Could he be any more unforgettable?</i><br>Ask about any title for its summary!`;
     }
 
-    // Check for mood or theme recommendations
+    // 6. Mood / Theme Recommendations
     const moodMatches = poemCatalog.filter(p => p.moods.some(m => q.includes(m)));
     if (moodMatches.length > 0) {
       const picks = moodMatches.slice(0, 3).map(p => `• <b>${p.title}</b> — ${p.summary}`).join("<br>");
-      return `Here are the best matches for that mood or theme:<br>${picks}`;
+      return `Here are poems matching that mood:<br>${picks}`;
     }
 
-    // Check for list / all poems / recommend
-    if (q.includes("recommend") || q.includes("suggest") || q.includes("poem") || q.includes("list") || q.includes("read")) {
-      const randomPick = poemCatalog[Math.floor(Math.random() * poemCatalog.length)];
-      return `I recommend reading <b>"${randomPick.title}"</b>.<br>${randomPick.summary}<br><br>You can also tell me a mood like <i>nostalgic, sad, nature, freedom,</i> or <i>tribute</i>!`;
+    // 7. Single-word feeling/topic fallback -> Co-create a stanza!
+    if (query.trim().split(/\s+/).length <= 2) {
+      return `Here is a short verse woven around <b>"${query.trim()}"</b>:<br><br>${composeStanza(query.trim())}`;
     }
 
-    return `I can help you explore Sara's poetry! Try asking:<br>• <i>"Tell me about Sara"</i><br>• <i>"Recommend a nostalgic or sad poem"</i><br>• <i>"What is Along The Sea about?"</i><br>• <i>"Tell me about the Matthew Perry poems"</i>`;
+    return `I can recommend poems by mood, explain Sara's pieces, or write a 4-line stanza! Try typing <b>"write a poem about midnight"</b> or ask about any poem on the page.`;
   }
 
   function sendMessage() {
