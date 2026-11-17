@@ -113,95 +113,98 @@ main { max-width: 56rem; margin: 0 auto; padding-block: 11vh 16vh; min-height: 6
   </nav>
 </header>
 <main><div id="app" class="view"></div></main>
-
 <script>
-const POEMS = [{"slug": "as-i-look", "title": "As I Look…", "group": "main", "stanzas": [["As I look up at the sky,", "I see a beautiful flock of birds fly,", "I see a stream of white satin clouds go by,", "I see a sky filled with tints, tones and hues up high,"], ["As I look down,", "I see a beach with the soft sand brown,", "I smell the petrichor, which shows me a world with no bounds,", "I hear the sound of the sand grumble like the ground,"], ["As I look ahead, at the coming sea,", "I see here, the world is set free,", "I see the peaceful ocean waves give me glee,", "I hear the waves slowly flee,"], ["As I look to the right,", "I see a dense forest standing fierce with might,", "I see the vast forest stretch till no more in sight,", "I see it standing alone with no fright."]]}, {"slug": "as-i-wait", "title": "As I Wait…", "group": "main", "stanzas": [["As the waves slowly skim my feet,", "I wait for my fate to meet,", "I wait alone without any fear,", "I wait for the misty sky to get clear,"], ["As I stand under a fir tree,", "I wait for an angel to take me to my glee,", "I wait with snow falling from the sky,", "I wait for the courage to help me fly,"], ["As I stand in the middle of a harsh storm,", "I wait for my new path to form,", "I wait for the winds to slow,", "I wait to meet my friends and foes,"], ["As I scramble through the jungle,", "I wait to make my life untangle,", "I wait silently, watching the chaos unfold,", "I wait for this story to be ancient lore told."]]}, {"slug": "along-the-sea", "title": "Along The Sea", "group": "main", "stanzas": [["As I walked along the seashore,", "I reminisced about the days astray,", "And heard a great lore,", "As per hearsay,"], ["As the waves crashed across the bay,", "As they swallowed themselves, like closing a door,", "Amidst the sand I lay,", "Therein lay the beauty, nothing I could ask for more."], ["As I swam across the ocean floor,", "I saw creatures from far away,", "They looked like nothing I had seen before,", "With colours like the Sun at midday."], ["As I sat on the sand as soft as hay,", "I already knew what was in store,", "Although the sky looked as clear as day,", "I knew this from my deep heart's core.", "I knew this for my heart was sore."]]}, {"slug": "falling-to-freedom", "title": "Falling To Freedom", "group": "main", "stanzas": [["As I slowly fell into the sea,", "The water already far past my knees,", "The depth not giving me the slightest fright,", "For my past gave me immense might,"], ["Running to save my lost glee, my forgotten glee,", "Trying to find the lost key,", "Like struggling to fly a kite,", "But it gave me not the fight,"], ["In the midst of it all, I could see,", "Only freedom to be,", "As I scrambled through the plight,", "And finally found the light, so bright,"], ["I did not think twice to flee,", "Or jump right into the sea,", "I never gave myself fright,", "For I knew there was something very bright."]]}, {"slug": "hadal-heart", "title": "The Journey To The Hadal Heart", "group": "main", "stanzas": [["As I swim across the seabed,", "I see the little fish being led,", "I see the fish, coloured like the sky during dawn,", "I see all the happiness in their eyes, even with many reasons to frown."], ["As I swim across the seabed,", "I see a coral reef filled with shades of red,", "I see the Sun slowly go away,", "As the blue water turns into darker hues of grey."], ["As I swim across the seabed,", "I see creatures I have never met,", "I see them in tints and tones of jade,", "I see them as they slowly fade."], ["As I swim across the seabed,", "I see the water slowly nearing a trench ahead,", "I see the water quickly clench,", "In the heavy darkness of the unbound trench."]]}, {"slug": "sweet-habit", "title": "Sweet Habits", "group": "main", "stanzas": [["I was once asked what it was like to be in Peace,", "I told them it is just like being on a beach in Greece,", "Peace is surrounded by quiet nature,", "Peace is filled with no thought of the future,"], ["Peace is slow breeze flowing through my hair,", "Peace is sewing the unwanted tear,", "Peace is the calm clatter of raindrops fast,", "Peace is something you hope will last,"], ["Peace is the beautiful scenery of the ocean blue,", "Peace is the lush green lawn with morning dew,", "Peace is seeing the fresh, cold, white snow,", "Peace is finding trees with the prettiest glow,"], ["Peace is something you cannot hear,", "Peace makes you feel like distress is nowhere near,", "Peace is a sweet habit made,", "I hope the Peace does not fade."]]}, {"slug": "never-forget", "title": "An Ode To The One We Will Never Forget", "group": "perry", "stanzas": [["The heart of mine lost its life,", "The enemy you once defeated,", "Came haunting to take your fleet,", "Desperation and distress befriended emaciation.", "Your renunciation endeavoured in delusion,", "The dreary life of yours, brittle,", "Plodding towards your long-forgotten enemy,", "Striving in infirmities of anguish,", "The anchor broke and brought with it a jarring defeat,", "The treacherous onslaught led us to the end,", "The world bearing the consequence of slain love,", "And plight ended with yellow journals in remorse."]]}, {"slug": "never-wanted", "title": "An Ode To The One With The Life He Never Wanted", "group": "perry", "stanzas": [["The pain behind the smile of yours,", "Silhouetted by an anxious deserted soul,", "Struggling in desperation,", "Living a life with brittle fragments of anguish,", "The world oblivious to your pretence,", "Unknown to your plights,", "Engulfed in the role you played,", "Until the ruse was no longer true,", "When the mask fell,", "It rained as though a violent spell cast its day,", "Although the tattoo was just giving way to the bugles,", "Today I realise, the glimmer in your eyes was just tears in disguise,", "The world you once thought would mock,", "Came with mournful wreaths,", "Reverence for you still lingers in the air,", "The bugle blows and bells ring now, and in remembrance always will."]]}, {"slug": "unforgettable", "title": "Could he be any more unforgettable?", "group": "perry", "stanzas": [["When the world was rejoicing in your cessation,", "A quiet necrosis took over your life,", "Trying to dissipate the new storm,", "The desperate cure of yours was instead your bane."], ["The queen of shadows sold you sleep, and kept the dawn,", "She scorned your soul and handed you eternal sleep,", "She dealt in dreams disguised as peace,", "Every fantasy hummed the silent song of death."], ["Once the last bell rang, the last prayer faded into sleep,", "The world woke up to an abandoned temple,", "Wrathful devotees made the sacred walls tremble with fear,", "And the queen quivered with divine reckoning."], ["Soon, the empress had to face the bench,", "With every fault exposed, she grew smaller still,", "Until her pride was burnt to ash,", "The gavel was finally hit; her hands bound forever in iron, and for you, ‘Could you be any more unforgettable?’"]]}];
-const app = document.getElementById("app");
-const DEDICATION = "These elegies are dedicated to the life of Matthew Perry, who was popularly known for his role as Chandler Bing in the famous TV show F.R.I.E.N.D.S. Although he made millions of people laugh, he quietly struggled with addiction and emotional pain for many years. The poems reflect the sadness hidden behind his smile and the difference between the happy person the world saw and the pain he felt inside. They also show how, after his death, people around the world remembered him with love, respect, and gratitude for the joy he brought into their lives.";
-const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const li = (p, n) => `<li><span class="n">${n}.</span><a href="#${p.slug}">${esc(p.title)}</a></li>`;
-const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+{
+  const toggleBtn = document.getElementById("poetry-toggle");
+  const closeBtn = document.getElementById("poetry-close");
+  const botBox = document.getElementById("poetry-bot");
+  const log = document.getElementById("chat-log");
+  const input = document.getElementById("chat-input");
+  const sendBtn = document.getElementById("chat-send");
 
-const PAGES = {
-  about: `<div class="page about"><h1>About</h1><p>Hi, I’m Sara - a student, reader, and writer who is still figuring things out.</p><p>I write about the things I feel, notice, and sometimes struggle to say out loud: growing up, friendships, emotions, identity, and the expectations we face. Writing is my way of making sense of my thoughts and turning them into something I can share.</p><p>I don’t have everything figured out, and I don’t think I need to. I’m simply learning, growing, and finding my voice - one word at a time.</p></div>`,
-  contact: `<div class="page"><h1>Contact</h1><p class="mail"><a href="mailto:sarapaleja@gmail.com">sarapaleja@gmail.com</a><button type="button" class="copy" id="copy">Copy</button></p></div>`
-};
+  let engine = null;
+  let isLoading = false;
 
-function home() {
-  const main = POEMS.filter(p => p.group === "main"), perry = POEMS.filter(p => p.group === "perry");
-  return `<div class="cover"><h1>Sara Paleja</h1><p>Poems</p></div>
-    <div class="list">
-      <ol>${main.map((p, i) => li(p, i + 1)).join("")}</ol>
-      <h2>For Matthew Perry</h2>
-      <p class="dedication">${DEDICATION}</p>
-      <ol>${perry.map((p, i) => li(p, main.length + i + 1)).join("")}</ol>
-    </div>`;
+  // Customize your personal bio here:
+  const authorBio = "Sara Paleja is the author of this poetry collection. Edit this sentence to share your background and writing style.";
+
+  // Grab the poems from your page (excluding the chat box itself)
+  const clone = document.body.cloneNode(true);
+  clone.querySelector("#poetry-bot")?.remove();
+  clone.querySelector("#poetry-toggle")?.remove();
+  const pageContent = clone.innerText.slice(0, 6500);
+
+  const messages = [
+    {
+      role: "system",
+      content: `You are a thoughtful literary guide for Sara Paleja's poetry website.
+      Your two primary roles are:
+      1. Answer questions about Sara's bio and explain the meanings, imagery, and themes of her poems.
+      2. Recommend specific poems from this page based on a reader's mood or requested theme, sharing brief summaries or key lines.
+
+      Author Bio: ${authorBio}
+
+      Poems on this page:
+      ${pageContent}
+
+      Keep responses warm, concise, and grounded strictly in the poems and bio provided.`
+    }
+  ];
+
+  // Open the chat box immediately when clicked
+  toggleBtn.addEventListener("click", async () => {
+    const isHidden = botBox.style.display === "none" || botBox.style.display === "";
+    botBox.style.display = isHidden ? "block" : "none";
+
+    if (!engine && !isLoading) {
+      isLoading = true;
+      log.innerHTML = "<i>Connecting to AI library...</i>";
+      try {
+        const webllm = await import("https://esm.run");
+        engine = await webllm.CreateMLCEngine("Llama-3.2-1B-Instruct-q4f16_1-MLC", {
+          initProgressCallback: (report) => {
+            log.innerHTML = `<i>Loading guide: ${Math.round(report.progress * 100)}%</i>`;
+          }
+        });
+        log.innerHTML = "Welcome. Tell me how you're feeling for a poem recommendation, or ask about any piece on this page.";
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+      } catch (err) {
+        log.innerHTML = "Could not load local AI: " + err.message;
+      }
+    }
+  });
+
+  closeBtn.addEventListener("click", () => {
+    botBox.style.display = "none";
+  });
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text || !engine) return;
+
+    input.value = "";
+    log.innerHTML += `<div class="chat-msg chat-user"><b>You:</b> ${text}</div>`;
+    messages.push({ role: "user", content: text });
+
+    const replyDiv = document.createElement("div");
+    replyDiv.className = "chat-msg";
+    replyDiv.innerHTML = "<b>Guide:</b> <i>reading...</i>";
+    log.appendChild(replyDiv);
+    log.scrollTop = log.scrollHeight;
+
+    const reply = await engine.chat.completions.create({ messages });
+    const botText = reply.choices.message.content;
+
+    replyDiv.innerHTML = `<b>Guide:</b> ${botText}`;
+    messages.push({ role: "assistant", content: botText });
+    log.scrollTop = log.scrollHeight;
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 }
-
-function poem(p) {
-  const i = POEMS.indexOf(p), next = POEMS[i + 1];
-  const verse = p.stanzas.map(s => `<p>${s.map(l => `<span>${esc(l)}</span>`).join("")}</p>`).join("");
-  return `<article class="leaf">
-      ${p.group === "perry" ? `<p class="for">For Matthew Perry</p>` : ""}
-      <h1>${esc(p.title)}</h1>
-      <div class="verse">${verse}</div>
-    </article>
-    <nav class="turn" aria-label="More poems">
-      <a href="#">All poems</a>
-      ${next ? `<a class="next" href="#${next.slug}">${esc(next.title)}</a>` : ""}
-    </nav>`;
-}
-
-function render() {
-  const slug = location.hash.slice(1);
-  const p = POEMS.find(x => x.slug === slug);
-  app.innerHTML = p ? poem(p) : (PAGES[slug] || home());
-  document.title = p ? `${p.title} · Sara Paleja` : "Sara Paleja Poems";
-  const current = PAGES[slug] ? slug : (p ? null : "");
-  document.documentElement.setAttribute("data-view", current === "" ? "home" : "other");
-  document.querySelectorAll("[data-nav]").forEach(a =>
-    a.dataset.nav === current ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
-}
-
-let first = true;
-function route() {
-  if (first || reduce) { render(); first = false; return; }
-  app.classList.add("out");
-  setTimeout(() => {
-    render();
-    window.scrollTo({ top: 0 });
-    app.classList.remove("out");
-    app.classList.add("in");
-    requestAnimationFrame(() => requestAnimationFrame(() => app.classList.remove("in")));
-  }, 180);
-}
-addEventListener("hashchange", route);
-app.addEventListener("click", e => {
-  const b = e.target.closest("#copy");
-  if (!b) return;
-  const done = () => { b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy"; }, 1600); };
-  const select = () => { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
-  try { navigator.clipboard.writeText("sarapaleja@gmail.com").then(done, select); } catch (err) { select(); }
-});
-route();
-
-/* Light / dark setting: follows the device until the reader picks one. */
-const root = document.documentElement, btn = document.getElementById("mode");
-const sys = matchMedia("(prefers-color-scheme: dark)");
-const isDark = () => root.getAttribute("data-mode") === "dark";
-function sync() {
-  const d = isDark();
-  root.setAttribute("data-dark", d ? "1" : "0");
-  btn.setAttribute("aria-label", d ? "Switch to light mode" : "Switch to dark mode");
-}
-try { if (localStorage.getItem("sp-mode") === "dark") root.setAttribute("data-mode", "dark"); } catch (e) {}
-btn.addEventListener("click", () => {
-  const t = isDark() ? "light" : "dark";
-  root.setAttribute("data-mode", t);
-  try { localStorage.setItem("sp-mode", t); } catch (e) {}
-  sync();
-});
-sync();
 </script>
 <!-- Custom Book-Style Poetry Assistant -->
 <style>
