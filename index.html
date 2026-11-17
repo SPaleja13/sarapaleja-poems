@@ -399,7 +399,7 @@ sync();
     // 1. Co-Creative Poetry Request
     const writeMatch = q.match(/(?:write|create|compose|poem about|stanza about|verse about|inspire)\s+(?:a\s+poem\s+about\s+|a\s+stanza\s+about\s+|about\s+|on\s+)?(.+)/i);
     if (writeMatch || q.startsWith("write ") || q.startsWith("poem ")) {
-      const topic = writeMatch ? writeMatch : q.replace(/^(write|poem)\s+/i, "");
+     const topic = writeMatch ? writeMatch[1] : q.replace(/^(write|poem)\s+/i, "");
       return `Here is a 4-line verse inspired by <b>"${topic}"</b> in Sara's style:<br><br>${composeStanza(topic)}`;
     }
 
