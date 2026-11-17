@@ -203,5 +203,199 @@ btn.addEventListener("click", () => {
 });
 sync();
 </script>
+<!-- Custom Book-Style Poetry Assistant -->
+<style>
+  #poetry-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--paper, #FDFBF7);
+    color: var(--ink, #1A1A1A);
+    border: 1px solid var(--quiet, #7A746D);
+    font-family: var(--ui, sans-serif);
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transition: all 0.3s var(--ease, ease);
+    z-index: 9999;
+  }
+  #poetry-toggle:hover {
+    border-color: var(--hover, #7A2E24);
+    color: var(--hover, #7A2E24);
+  }
+  #poetry-bot {
+    display: none;
+    position: fixed;
+    bottom: 74px;
+    right: 24px;
+    width: 330px;
+    max-width: calc(100vw - 48px);
+    background: var(--paper, #FDFBF7);
+    color: var(--ink, #1A1A1A);
+    border: 1px solid var(--quiet, #7A746D);
+    border-radius: 12px;
+    padding: 16px;
+    font-family: var(--body, Georgia, serif);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    z-index: 9999;
+  }
+  #poetry-bot-header {
+    font-family: var(--display, Georgia, serif);
+    font-size: 18px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(122, 116, 109, 0.25);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #chat-log {
+    height: 220px;
+    overflow-y: auto;
+    font-size: 15px;
+    line-height: 1.55;
+    padding-right: 4px;
+    margin-bottom: 12px;
+  }
+  .chat-msg { margin-bottom: 10px; }
+  .chat-user { color: var(--hover, #7A2E24); }
+  #chat-controls {
+    display: flex;
+    gap: 8px;
+    border-top: 1px solid rgba(122, 116, 109, 0.25);
+    padding-top: 10px;
+  }
+  #chat-input {
+    flex: 1;
+    background: transparent;
+    color: var(--ink, #1A1A1A);
+    border: 1px solid var(--quiet, #7A746D);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-family: var(--ui, sans-serif);
+    font-size: 13px;
+  }
+  #chat-send {
+    background: var(--ink, #1A1A1A);
+    color: var(--paper, #FDFBF7);
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-family: var(--ui, sans-serif);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  #chat-send:disabled, #chat-input:disabled { opacity: 0.5; }
+</style>
+
+<button id="poetry-toggle">Ask the Poetry Guide</button>
+
+<div id="poetry-bot">
+  <div id="poetry-bot-header">
+    <span>Poetry Guide</span>
+    <span id="poetry-close" style="cursor:pointer; font-family:var(--ui, sans-serif); font-size:14px; color:var(--quiet);">✕</span>
+  </div>
+  <div id="chat-log">Click below or ask a question once the guide wakes up...</div>
+  <div id="chat-controls">
+    <input id="chat-input" type="text" placeholder="Ask about a poem or mood..." disabled />
+    <button id="chat-send" disabled>Send</button>
+  </div>
+</div>
+
+<script type="module">
+  import * as webllm from "https://esm.run";
+
+  const toggleBtn = document.getElementById("poetry-toggle");
+  const closeBtn = document.getElementById("poetry-close");
+  const botBox = document.getElementById("poetry-bot");
+  const log = document.getElementById("chat-log");
+  const input = document.getElementById("chat-input");
+  const btn = document.getElementById("chat-send");
+
+  let engine = null;
+  let isLoading = false;
+
+  // Customize your personal bio here:
+  const authorBio = "Sara Paleja is the author of this poetry collection. Edit this sentence to share your background and writing style.";
+
+  // Grab the poems from your page (excluding the chat box itself)
+  const clone = document.body.cloneNode(true);
+  clone.querySelector("#poetry-bot")?.remove();
+  clone.querySelector("#poetry-toggle")?.remove();
+  const pageContent = clone.innerText.slice(0, 6500);
+
+  const messages = [
+    {
+      role: "system",
+      content: `You are a thoughtful literary guide for Sara Paleja's poetry website.
+      Your two primary roles are:
+      1. Answer questions about Sara's bio and explain the meanings, imagery, and themes of her poems.
+      2. Recommend specific poems from this page based on a reader's mood or requested theme, sharing brief summaries or key lines.
+
+      Author Bio: ${authorBio}
+
+      Poems on this page:
+      ${pageContent}
+
+      Keep responses warm, concise, and grounded strictly in the poems and bio provided.`
+    }
+  ];
+
+  // Only load the AI model when the visitor actually opens the chat
+  toggleBtn.addEventListener("click", async () => {
+    const isHidden = botBox.style.display === "none" || botBox.style.display === "";
+    botBox.style.display = isHidden ? "block" : "none";
+
+    if (!engine && !isLoading) {
+      isLoading = true;
+      log.innerHTML = "<i>Preparing the literary guide (takes ~15s the first time)...</i>";
+      try {
+        engine = await webllm.CreateMLCEngine("Llama-3.2-1B-Instruct-q4f16_1-MLC", {
+          initProgressCallback: (report) => {
+            log.innerHTML = `<i>Loading guide: ${Math.round(report.progress * 100)}%</i>`;
+          }
+        });
+        log.innerHTML = "Welcome. Tell me how you're feeling for a poem recommendation, or ask about any piece on this page.";
+        input.disabled = false;
+        btn.disabled = false;
+        input.focus();
+      } catch (err) {
+        log.innerHTML = "Sorry, your browser doesn't support local AI (requires Chrome or Edge with WebGPU enabled).";
+      }
+    }
+  });
+
+  closeBtn.addEventListener("click", () => {
+    botBox.style.display = "none";
+  });
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text || !engine) return;
+
+    input.value = "";
+    log.innerHTML += `<div class="chat-msg chat-user"><b>You:</b> ${text}</div>`;
+    messages.push({ role: "user", content: text });
+
+    const replyDiv = document.createElement("div");
+    replyDiv.className = "chat-msg";
+    replyDiv.innerHTML = "<b>Guide:</b> <i>reading...</i>";
+    log.appendChild(replyDiv);
+    log.scrollTop = log.scrollHeight;
+
+    const reply = await engine.chat.completions.create({ messages });
+    const botText = reply.choices[0].message.content;
+
+    replyDiv.innerHTML = `<b>Guide:</b> ${botText}`;
+    messages.push({ role: "assistant", content: botText });
+    log.scrollTop = log.scrollHeight;
+  }
+
+  btn.addEventListener("click", sendMessage);
+  input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+</script>
 </body>
 </html>
