@@ -313,90 +313,89 @@ sync();
   const input = document.getElementById("chat-input");
   const sendBtn = document.getElementById("chat-send");
 
-  let engine = null;
-  let isLoading = false;
-  let messages = [];
+  // 1. Customize your bio here:
+  const authorBio = "Sara Paleja is a poet whose work explores memory, emotion, sea imagery, freedom, and heartfelt tributes—including elegies dedicated to Matthew Perry.";
 
-  // Customize your personal bio here:
-  const authorBio = "Sara Paleja is the author of this poetry collection. Edit this sentence to share your background and writing style.";
+  // 2. Poem catalog & themes (add or edit descriptions for any poem anytime):
+  const poemCatalog = [
+    { title: "As I Look...", moods: ["reflective", "observant", "calm", "introspective"], summary: "A reflective piece exploring perspective, quiet observation, and inner stillness." },
+    { title: "As I Wait...", moods: ["patient", "longing", "hopeful", "nostalgic"], summary: "Captures the quiet tension and emotion of anticipation and waiting." },
+    { title: "Along The Sea", moods: ["nature", "ocean", "peaceful", "calm", "nostalgic"], summary: "Uses imagery of the sea to reflect on depth, movement, and serenity." },
+    { title: "Falling To Freedom", moods: ["freedom", "inspiring", "emotional", "letting go", "sad"], summary: "Explores the release of letting go and finding liberation through vulnerability." },
+    { title: "The Journey To The Hadal Heart", moods: ["deep", "emotional", "introspective", "sad", "dark"], summary: "A profound dive into the deepest, hidden chambers of the human heart." },
+    { title: "Sweet Habits", moods: ["nostalgic", "warm", "love", "comfort", "reflective"], summary: "Looks at the comforting routines and small moments that stay with us." },
+    { title: "An Ode To The One We Will Never Forget", moods: ["tribute", "grief", "sad", "matthew perry", "nostalgic", "memory"], summary: "A heartfelt elegy honoring Matthew Perry's lasting legacy, humor, and the joy he brought to millions." },
+    { title: "An Ode To The One With The Life He Never Wanted", moods: ["grief", "sad", "pain", "matthew perry", "emotional", "empathy"], summary: "Reflects on the hidden struggles behind Matthew Perry's public smile and the pain he quietly carried." },
+    { title: "Could he be any more unforgettable?", moods: ["tribute", "matthew perry", "nostalgic", "love", "memory", "grateful"], summary: "Celebrates Matthew Perry's iconic charm and the gratitude fans around the world feel for his life." }
+  ];
 
-  toggleBtn.addEventListener("click", async () => {
+  // Enable input immediately
+  log.innerHTML = "Welcome! Ask me about <b>Sara's bio</b>, ask for a <b>poem recommendation by mood</b> (e.g., <i>sad, nature, nostalgic, tribute</i>), or ask what a specific poem is about.";
+  input.disabled = false;
+  sendBtn.disabled = false;
+
+  toggleBtn.addEventListener("click", () => {
     const isHidden = botBox.style.display === "none" || botBox.style.display === "";
     botBox.style.display = isHidden ? "block" : "none";
-
-    if (!engine && !isLoading) {
-      isLoading = true;
-      log.innerHTML = "<i>Connecting to AI library...</i>";
-
-      // Read the rendered poems right when the user opens the chat
-      const clone = document.body.cloneNode(true);
-      clone.querySelector("#poetry-bot")?.remove();
-      clone.querySelector("#poetry-toggle")?.remove();
-      const pageContent = clone.innerText.slice(0, 6500);
-
-      messages = [
-        {
-          role: "system",
-          content: `You are a thoughtful literary guide for Sara Paleja's poetry website.
-          Your two primary roles are:
-          1. Answer questions about Sara's bio and explain the meanings, imagery, and themes of her poems.
-          2. Recommend specific poems from this page based on a reader's mood or requested theme, sharing brief summaries or key lines.
-
-          Author Bio: ${authorBio}
-
-          Poems on this page:
-          ${pageContent}
-
-          Keep responses warm, concise, and grounded strictly in the poems and bio provided.`
-        }
-      ];
-
-      try {
-       2. const webllm = await import("https://jsdelivr.net");
-        engine = await webllm.CreateMLCEngine("Llama-3.2-1B-Instruct-q4f16_1-MLC", {
-          initProgressCallback: (report) => {
-            log.innerHTML = `<i>Loading guide: ${Math.round(report.progress * 100)}%</i>`;
-          }
-        });
-        log.innerHTML = "Welcome. Tell me how you're feeling for a poem recommendation, or ask about any piece on this page.";
-        input.disabled = false;
-        sendBtn.disabled = false;
-        input.focus();
-      } catch (err) {
-        log.innerHTML = "Could not load local AI: " + err.message;
-      }
-    }
+    if (isHidden) input.focus();
   });
 
   closeBtn.addEventListener("click", () => {
     botBox.style.display = "none";
   });
 
-  async function sendMessage() {
+  function generateReply(query) {
+    const q = query.toLowerCase();
+
+    // Check for bio / author questions
+    if (q.includes("who") || q.includes("bio") || q.includes("sara") || q.includes("author") || q.includes("about you") || q.includes("style")) {
+      return `<b>About Sara Paleja:</b> ${authorBio}`;
+    }
+
+    // Check if asking about a specific poem title
+    const titleMatch = poemCatalog.find(p => q.includes(p.title.toLowerCase().replace(/\.\.\.|\?/g, "").trim()));
+    if (titleMatch) {
+      return `<b>"${titleMatch.title}"</b><br>${titleMatch.summary}<br><i>Themes: ${titleMatch.moods.join(", ")}</i>`;
+    }
+
+    // Check for Matthew Perry elegies
+    if (q.includes("matthew") || q.includes("perry") || q.includes("chandler") || q.includes("elegy") || q.includes("elegies")) {
+      return `Sara wrote three elegies dedicated to <b>Matthew Perry</b>:<br>• <i>An Ode To The One We Will Never Forget</i><br>• <i>An Ode To The One With The Life He Never Wanted</i><br>• <i>Could he be any more unforgettable?</i><br>Ask me about any of these titles for a summary!`;
+    }
+
+    // Check for mood or theme recommendations
+    const moodMatches = poemCatalog.filter(p => p.moods.some(m => q.includes(m)));
+    if (moodMatches.length > 0) {
+      const picks = moodMatches.slice(0, 3).map(p => `• <b>${p.title}</b> — ${p.summary}`).join("<br>");
+      return `Here are the best matches for that mood or theme:<br>${picks}`;
+    }
+
+    // Check for list / all poems / recommend
+    if (q.includes("recommend") || q.includes("suggest") || q.includes("poem") || q.includes("list") || q.includes("read")) {
+      const randomPick = poemCatalog[Math.floor(Math.random() * poemCatalog.length)];
+      return `I recommend reading <b>"${randomPick.title}"</b>.<br>${randomPick.summary}<br><br>You can also tell me a mood like <i>nostalgic, sad, nature, freedom,</i> or <i>tribute</i>!`;
+    }
+
+    return `I can help you explore Sara's poetry! Try asking:<br>• <i>"Tell me about Sara"</i><br>• <i>"Recommend a nostalgic or sad poem"</i><br>• <i>"What is Along The Sea about?"</i><br>• <i>"Tell me about the Matthew Perry poems"</i>`;
+  }
+
+  function sendMessage() {
     const text = input.value.trim();
-    if (!text || !engine) return;
+    if (!text) return;
 
     input.value = "";
     log.innerHTML += `<div class="chat-msg chat-user"><b>You:</b> ${text}</div>`;
-    messages.push({ role: "user", content: text });
 
     const replyDiv = document.createElement("div");
     replyDiv.className = "chat-msg";
-    replyDiv.innerHTML = "<b>Guide:</b> <i>reading...</i>";
+    replyDiv.innerHTML = `<b>Guide:</b> ${generateReply(text)}`;
     log.appendChild(replyDiv);
-    log.scrollTop = log.scrollHeight;
-
-    const reply = await engine.chat.completions.create({ messages });
-    const botText = reply.choices.message.content;
-
-    replyDiv.innerHTML = `<b>Guide:</b> ${botText}`;
-    messages.push({ role: "assistant", content: botText });
     log.scrollTop = log.scrollHeight;
   }
 
   sendBtn.addEventListener("click", sendMessage);
   input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 })();
-</script>	
+</script>
 </body>
 </html>
