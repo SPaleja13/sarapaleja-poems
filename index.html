@@ -500,49 +500,17 @@ sync();
     input.focus();
   }
 
-   function sendPoemEmail(btnEl) {
+    function sendPoemEmail(btnEl) {
     if (!lastCompletedPoem || !reader) return;
 
-    // 1. Submit via standard hidden HTML form (works reliably & triggers FormSubmit activation)
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = `https://formsubmit.co{SARA_EMAIL}`;
-    form.target = "_blank";
+    const subject = `Co-Written Poem from ${reader.name}`;
+    const body = `Hi Sara,\n\nHere is a poem I co-wrote on your Poetry Guide:\n\n${lastCompletedPoem}\n\n— ${reader.name} (${reader.email})`;
+    const gmailUrl = `https://google.com{encodeURIComponent(SARA_EMAIL)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-    const fields = {
-      _subject: `New Co-Written Poem from ${reader.name}!`,
-      _captcha: "false",
-      Reader_Name: reader.name,
-      Reader_Email: reader.email,
-      Collaborative_Poem: lastCompletedPoem
-    };
-
-    for (const [key, val] of Object.entries(fields)) {
-      const hidden = document.createElement("input");
-      hidden.type = "hidden";
-      hidden.name = key;
-      hidden.value = val;
-      form.appendChild(hidden);
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-    form.remove();
-
-    btnEl.textContent = "✓ Submitted! (Check new tab)";
-
-    // 2. Also add a direct Gmail Web button in case FormSubmit is blocked on a visitor's Wi-Fi
-    if (!btnEl.parentElement.querySelector(".gmail-backup")) {
-      const gmailUrl = `https://google.com{encodeURIComponent(SARA_EMAIL)}&su=${encodeURIComponent("Co-Written Poem from " + reader.name)}&body=${encodeURIComponent("Reader: " + reader.name + " (" + reader.email + ")\n\n" + lastCompletedPoem)}`;
-      const gmailBtn = document.createElement("a");
-      gmailBtn.href = gmailUrl;
-      gmailBtn.target = "_blank";
-      gmailBtn.className = "bot-chip gmail-backup";
-      gmailBtn.style.textDecoration = "none";
-      gmailBtn.textContent = "📧 Or Send via Gmail";
-      btnEl.parentElement.appendChild(gmailBtn);
-    }
+    window.open(gmailUrl, "_blank");
+    btnEl.textContent = "✓ Opened in Gmail!";
   }
+
   function generateReply(query) {
     const q = query.toLowerCase().trim();
 
