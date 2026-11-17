@@ -451,6 +451,147 @@ sync();
 
   toggleBtn.addEventListener("click", () => {
     const isHidden = botBox.style.display === "none" || botBox.style.display === "";
+        botBox.style.display = isHidden ? "block" : "none";
+    if (isHidden) input.focus();
+  });
+
+  closeBtn.addEventListener("click", () => {
+    botBox.style.display = "none";
+  });
+
+  function showSignInPrompt() {
+    const card = document.createElement("div");
+    card.className = "signin-card";
+    card.innerHTML = `
+      <b>Sign in to Co-Write & Email Your Poem</b>
+      <div style="color:var(--quiet); margin-top:2px;">Enter your name & email so Sara knows who co-wrote the stanza:</div>
+      <input type="text" id="sp-name" placeholder="Your Name" />
+      <input type="email" id="sp-email" placeholder="Your Email" />
+      <button class="signin-btn" id="sp-submit">Start Finish the Line Game</button>
+    `;
+    log.appendChild(card);
+    log.scrollTop = log.scrollHeight;
+
+    card.querySelector("#sp-submit").addEventListener("click", () => {
+      const nameVal = card.querySelector("#sp-name").value.trim();
+      const emailVal = card.querySelector("#sp-email").value.trim();
+      if (!nameVal || !emailVal.includes("@")) {
+        alert("Please enter both your name and a valid email address.");
+        return;
+      }
+      reader = { name: nameVal, email: emailVal };
+      localStorage.setItem("sp_reader", JSON.stringify(reader));
+      readerBadge.textContent = `Hi, ${reader.name}`;
+      card.remove();
+      startFinishTheLine();
+    });
+  }
+
+  function startFinishTheLine() {
+    const pick = openingPrompts[Math.floor(Math.random() * openingPrompts.length)];
+    gameState = { active: true, line1: pick.line, rhymeKey: pick.rhyme };
+    const div = document.createElement("div");
+    div.className = "chat-msg";
+    div.innerHTML = `<b>Guide:</b> Let's co-write a stanza, <b>${reader.name}</b>! Here is Line 1:<br><br><i>"${pick.line}"</i><br><br>Type <b>Line 2</b> below and I will finish the stanza to match your rhyme and tone!`;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    input.placeholder = "Type your second line here...";
+    input.focus();
+  }
+
+  async function sendPoemEmail(btnEl) {
+    if (!lastCompletedPoem || !reader) return;
+    btnEl.disabled = true;
+    btnEl.textContent = "Sending to Sara...";
+
+    try {
+      const res = await fetch(`https://formsubmit.co{SARA_EMAIL}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          _subject: `New Co-Written Poem from ${reader.name}!`,
+          Reader_Name: reader.name,
+          Reader_Email: reader.email,
+          Collaborative_Poem: lastCompletedPoem
+        })
+      });
+      if (res.ok) {
+        btnEl.textContent = "✓ Emailed to Sara!";
+      } else {
+        throw new Error("FormSubmit error");
+      }
+    } catch (err) {
+      const mailto = `mailto:${SARA_EMAIL}?subject=${encodeURIComponent("Co-Written Poem from " + reader.name)}&body=${encodeURIComponent("Reader: " + reader.name + " (" + reader.email + ")\n\n" + lastCompletedPoem)}`;
+      window.location.href = mailto;
+      btnEl.textContent = "Opened Email App";
+    }
+  }
+
+  function generateReply(query) {
+    const q = query.toLowerCase().trim();
+
+    if (gameState.active) {
+      gameState.active = false;
+      input.placeholder = "Ask about a poem or play Finish the Line...";
+      const fullPoem = completeStanza(gameState.line1, query.trim());
+      lastCompletedPoem = fullPoem;
+      return `Here is our completed collaborative stanza:<br><br>
+        <div style="padding:8px; border-left:2px solid var(--hover, #7A2E24); font-style:italic;">
+          ${fullPoem.replace(/\n/g, "<br>")}
+        </div>
+        <button class="bot-chip" data-cmd="email_sara">✉️ Email This Poem to Sara</button>
+        <button class="bot-chip" data-cmd="finish the line">🔄 Play Again</button>`;
+    }
+
+    if (q.includes("finish") || q.includes("game") || q.includes("co-write") || q.includes("cowrite") || q.includes("sign in")) {
+      if (!reader) {
+        setTimeout(showSignInPrompt, 50);
+        return `Please sign in below to start the <b>Finish the Line</b> challenge and send your verse to Sara:`;
+      } else {
+        setTimeout(startFinishTheLine, 50);
+        return `Starting a new round...`;
+      }
+    }
+
+    if (q.includes("who") || q.includes("bio") || q.includes("sara") || q.includes("author") || (q.includes("about") && !q.includes("what is"))) {
+      return `<b>About Sara Paleja:</b> ${authorBio}`;
+    }
+
+    const titleMatch = poemCatalog.find(p => q.includes(p.title.toLowerCase().replace(/\.\.\.|\?/g, "").trim()));
+    if (titleMatch) {
+      return `<b>"${titleMatch.title}"</b><br>${titleMatch.summary}<br><i>Themes: ${titleMatch.moods.join(", ")}</i>`;
+    }
+
+    if (q.includes("matthew") || q.includes("perry") || q.includes("chandler") || q.includes("elegy")) {
+      return `Sara wrote three elegies dedicated to <b>Matthew Perry</b>:<br>• <i>An Ode To The One We Will Never Forget</i><br>• <i>An Ode To The One With The Life He Never Wanted</i><br>• <i>Could he be any more unforgettable?</i>`;
+    }
+
+    const moodMatches = poemCatalog.filter(p => p.moods.some(m => q.includes(m)));
+    if (moodMatches.length > 0) {
+      const picks = moodMatches.slice(0, 3).map(p => `• <b>${p.title}</b> — ${p.summary}`).join("<br>");
+      return `Here are poems matching that mood:<br>${picks}`;
+    }
+
+    return `Click <b>✍️ Finish the Line Game</b> to sign in, co-write a stanza, and email it to Sara—or ask me about any poem on the page!`;
+  }
+
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = "";
+    log.innerHTML += `<div class="chat-msg chat-user"><b>You:</b> ${text}</div>`;
+
+    const replyDiv = document.createElement("div");
+    replyDiv.className = "chat-msg";
+    replyDiv.innerHTML = `<b>Guide:</b> ${generateReply(text)}`;
+    log.appendChild(replyDiv);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+})();
 </script>
 </body>
 </html>
