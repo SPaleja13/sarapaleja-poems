@@ -342,7 +342,8 @@ sync();
   <div id="poetry-bot-header">
     <span>Poetry Guide</span>
     <div>
-      <span id="reader-badge" style="font-family:var(--ui, sans-serif); font-size:11px; color:var(--quiet); margin-right:8px;"></span>
+          <span id="reader-badge" style="font-family:var(--ui, sans-serif); font-size:11px; color:var(--quiet); margin-right:6px;"></span>
+      <span id="reader-signout" style="display:none; cursor:pointer; font-family:var(--ui, sans-serif); font-size:11px; color:var(--hover, #7A2E24); text-decoration:underline; margin-right:10px;">Sign out</span>
       <span id="poetry-close" style="cursor:pointer; font-family:var(--ui, sans-serif); font-size:14px; color:var(--quiet);">✕</span>
     </div>
   </div>
@@ -364,16 +365,32 @@ sync();
   const input = document.getElementById("chat-input");
   const sendBtn = document.getElementById("chat-send");
   const readerBadge = document.getElementById("reader-badge");
+  const signOutBtn = document.getElementById("reader-signout");
+ let reader = JSON.parse(localStorage.getItem("sp_reader") || "null");
+  function updateReaderUI() {
+    if (reader) {
+      readerBadge.textContent = "Hi, " + reader.name;
+      signOutBtn.style.display = "inline";
+    } else {
+      readerBadge.textContent = "";
+      signOutBtn.style.display = "none";
+    }
+  }
+  updateReaderUI();
 
-  let reader = JSON.parse(localStorage.getItem("sp_reader") || "null");
+  signOutBtn.addEventListener("click", () => {
+    localStorage.removeItem("sp_reader");
+    reader = null;
+    gameState.active = false;
+    updateReaderUI();
+    log.innerHTML += '<div class="chat-msg"><b>Guide:</b> You have signed out. Click <b>✍️ Finish the Line Game</b> anytime to sign in as a new reader!</div>';
+    log.scrollTop = log.scrollHeight;
+  });
+
   let gameState = { active: false, line1: "", rhymeKey: "" };
   let lastCompletedPoem = "";
 
-  if (reader) {
-    readerBadge.textContent = `Hi, ${reader.name}`;
-  }
-
-  const authorBio = "Sara Paleja is a poet whose work explores memory, sea imagery, quiet longing, freedom, and heartfelt tributes—including elegies dedicated to Matthew Perry.";
+  const authorBio = "Sara Paleja is a student, a poet whose work explores memory, sea imagery, quiet longing, freedom, and heartfelt tributes—including elegies dedicated to Matthew Perry.";
 
   const dailyVerses = [
     "“In the quiet between waves, memory finds its voice.” — Inspired by Along The Sea",
@@ -480,9 +497,9 @@ sync();
         alert("Please enter both your name and a valid email address.");
         return;
       }
-      reader = { name: nameVal, email: emailVal };
+            reader = { name: nameVal, email: emailVal };
       localStorage.setItem("sp_reader", JSON.stringify(reader));
-      readerBadge.textContent = `Hi, ${reader.name}`;
+      updateReaderUI();
       card.remove();
       startFinishTheLine();
     });
