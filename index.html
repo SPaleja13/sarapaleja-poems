@@ -514,23 +514,23 @@ sync();
   function generateReply(query) {
     const q = query.toLowerCase().trim();
 
-       if (gameState.active) {
+        if (gameState.active) {
       gameState.active = false;
       input.placeholder = "Ask about a poem or play Finish the Line...";
       const fullPoem = completeStanza(gameState.line1, query.trim());
       lastCompletedPoem = fullPoem;
 
-      const subject = `Co-Written Poem from ${reader.name}`;
-      const body = `Hi Sara,\n\nHere is a poem I co-wrote on your Poetry Guide:\n\n${fullPoem}\n\n— ${reader.name} (${reader.email})`;
-      const gmailUrl = `https://google.com{encodeURIComponent(SARA_EMAIL)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      const subject = "Co-Written Poem from " + reader.name;
+      const body = "Hi Sara,\n\nHere is a poem I co-wrote on your Poetry Guide:\n\n" + fullPoem + "\n\n— " + reader.name + " (" + reader.email + ")";
+      const gmailUrl = "https://google.com" + encodeURIComponent(SARA_EMAIL) + "&su=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
 
-      return `Here is our completed collaborative stanza:<br><br>
-        <div style="padding:8px; border-left:2px solid var(--hover, #7A2E24); font-style:italic;">
-          ${fullPoem.replace(/\n/g, "<br>")}
-        </div>
-        <a href="${gmailUrl}" class="bot-chip" style="text-decoration:none;">✉️ Open in Gmail</a>
-        <button class="bot-chip" onclick="navigator.clipboard.writeText(this.dataset.poem); this.textContent='✓ Copied!'" data-poem="${body.replace(/"/g, '&quot;')}">📋 Copy Poem</button>
-        <button class="bot-chip" data-cmd="finish the line">🔄 Play Again</button>`;
+      return 'Here is our completed collaborative stanza:<br><br>' +
+        '<div style="padding:8px; border-left:2px solid var(--hover, #7A2E24); font-style:italic;">' +
+          fullPoem.replace(/\n/g, "<br>") +
+        '</div>' +
+        '<a href="' + gmailUrl + '" class="bot-chip" style="text-decoration:none;">✉️ Open in Gmail</a> ' +
+        '<button class="bot-chip" onclick="navigator.clipboard.writeText(this.dataset.poem); this.textContent=\'✓ Copied!\'" data-poem="' + body.replace(/"/g, '&quot;') + '">📋 Copy Poem</button> ' +
+        '<button class="bot-chip" data-cmd="finish the line">🔄 Play Again</button>';
     }
 
     if (q.includes("finish") || q.includes("game") || q.includes("co-write") || q.includes("cowrite") || q.includes("sign in")) {
