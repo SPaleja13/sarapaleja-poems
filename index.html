@@ -547,7 +547,6 @@ sync();
         '</div>' +
         '<div style="margin-top:6px; font-size:12px; color:var(--quiet);">Send to: <b>' + SARA_EMAIL + '</b></div>' +
         '<button class="bot-chip" onclick="navigator.clipboard.writeText(this.dataset.poem); this.textContent=\'✓ Copied! Paste in Gmail\'" data-poem="' + body.replace(/"/g, '&quot;') + '">📋 Copy Poem & Email</button> ' +
-        '<a href="' + mailtoUrl + '" class="bot-chip" style="text-decoration:none;">✉️ Open Mail App</a> ' +
         '<button class="bot-chip" data-cmd="finish the line">🔄 Play Again</button>';
     }
 
